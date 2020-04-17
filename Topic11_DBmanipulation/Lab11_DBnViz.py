@@ -69,8 +69,43 @@ errorNp = rateDF['Cum'].values - Np
 SSE_Np = np.dot(errorNp, errorNp)
 
 # Read from Rates database table using the SQL SELECT statement
-prodDF = pd.read_sql_query("SELECT time, rate FROM Rates WHERE wellID=1;", conn)
+prodDF = pd.read_sql_query("SELECT * FROM Rates WHERE wellID=1;", conn)
 dcaDF = pd.read_sql_query("SELECT * FROM DCAparams;", conn)
   
+
+
+
+# Create Production Plots
+
+# custom Plot parameters
+titleFontSize = 18
+axisLabelFontSize = 15
+axisNumFontSize = 13
+
+currFig = plt.figure(figsize=(7,5), dpi=100)
+
+# Add set of axes to figure
+axes = currFig.add_axes([0.15, 0.15, 0.7, 0.7])# left, bottom, width, height (range 0 to 1)
+
+# Plot on that set of axes
+axes.plot(prodDF['time'], prodDF['Cum']/1000, color="red", ls='None', marker='o', markersize=5,label = 'well '+str(wellID) )
+axes.plot(prodDF['time'], prodDF['Cum_model']/1000, color="red", lw=3, ls='-',label = 'well '+str(wellID) )
+axes.legend(loc=4)
+axes.set_title('Cumulative Production vs Time', fontsize=titleFontSize, fontweight='bold')
+axes.set_xlabel('Time, Months', fontsize=axisLabelFontSize, fontweight='bold') # Notice the use of set_ to begin methods
+axes.set_ylabel('Cumulative Production, Mbbls', fontsize=axisLabelFontSize, fontweight='bold')
+axes.set_ylim([0, 1200])
+axes.set_xlim([0, 25])
+xticks = range(0,30,5) #np.linspace(0,4000,5)
+axes.set_xticks(xticks)
+axes.set_xticklabels(xticks, fontsize=axisNumFontSize); 
+
+yticks = [0, 400, 800, 1200]
+axes.set_yticks(yticks)
+axes.set_yticklabels(yticks, fontsize=axisNumFontSize); 
+
+currFig.savefig('well'+str(wellID)+'_Gp.png', dpi=600)
+
+
 conn.close()
 
