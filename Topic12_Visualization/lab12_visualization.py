@@ -21,16 +21,6 @@ conn = sqlite3.connect("DCA.db")  #It will only connect to the DB if it already 
 #create data table to store summary info about each case/well
 cur = conn.cursor()
 
-
-##Syntax to add new columns to a table
-#cur.execute("ALTER TABLE Rates ADD rateID INTEGER;")
-#conn.commit()
-
-#Syntax to delete a table
-#cur.execute("DROP TABLE DCAparams;")
-#cur.execute("DROP TABLE Rates;")
-#conn.commit()
-
 #Custom Plot parameters
 titleFontSize = 18
 axisLabelFontSize = 15
@@ -38,8 +28,8 @@ axisNumFontSize = 13
 
 
 #RUN THIS TO CREATE A NEW TABLE
-#cur.execute("CREATE TABLE DCAparams (wellID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,  qi REAL, Di REAL, b REAL, fluid TEXT)")
-#conn.commit()
+cur.execute("CREATE TABLE DCAparams (wellID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, qi REAL, Di REAL, b REAL, fluid TEXT)")
+conn.commit()
 
 dfLength = 24
 gasWellID = np.random.randint(1,17,5)   #arguments are low, high, size
@@ -63,9 +53,9 @@ for wellID in range(1,18):
     
     
     if wellID in gasWellID:
-        cur.execute("INSERT INTO DCAparams VALUES ({},{},{},{},'gas')".format(wellID, qi, Di, b))
+        cur.execute(f"INSERT INTO DCAparams VALUES ({wellID}, {qi}, {Di}, {b},'gas')")
     else:
-        cur.execute("INSERT INTO DCAparams VALUES ({},{},{},{},'oil')".format(wellID, qi, Di, b))
+        cur.execute(f"INSERT INTO DCAparams VALUES ({wellID}, {qi}, {Di}, {b},'oil')")
 
     conn.commit()
     
@@ -121,7 +111,7 @@ for wellID in range(1,18):
     axes.set_yticks(yticks)
     axes.set_yticklabels(yticks, fontsize=axisNumFontSize); 
     
-    currFig.savefig('well'+str(wellID)+'_Gp.png', dpi=600)
+    #currFig.savefig('well'+str(wellID)+'_Gp.png', dpi=600)
 
 
 
@@ -185,7 +175,7 @@ plt.show()
 N = 12
 ind = np.arange(1,N+1)    # the x locations for the groups
 months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-width = 0.5       # the width of the bars: can also be len(x) sequence
+width = 0.5       # the width of the bars
 
 p1 = plt.bar(df1['time'][0:N], df1['Cum'][0:N]/1000, width)
 p2 = plt.bar(df1['time'][0:N], df2['Cum'][0:N]/1000, width, bottom=df1['Cum'][0:N]/1000)
@@ -235,7 +225,7 @@ fig = plt.figure(figsize=(5,15), dpi=100)
 plt.plot(rho,DZ, color='blue')
 plt.xlabel('Density, g/cc', fontsize = 14, fontweight='bold')
 plt.ylabel('Depth, m', fontsize = 14, fontweight='bold')
-plt.gca().invert_yaxis()
+plt.gca().invert_yaxis()  # This is what inverts the direction of the y-axis
 plt.show()
 
 titleFontSize = 22
@@ -296,3 +286,14 @@ plt.gca().invert_yaxis()
 fig.savefig('well_1_log.png', dpi=600)
 
 
+
+
+
+##Syntax to add new columns to a table
+#cur.execute("ALTER TABLE Rates ADD rateID INTEGER;")
+#conn.commit()
+
+#Syntax to delete a table
+#cur.execute("DROP TABLE DCAparams;")
+#cur.execute("DROP TABLE Rates;")
+#conn.commit()
